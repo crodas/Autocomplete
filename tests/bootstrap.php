@@ -24,7 +24,7 @@ class DB implements DBInterface
 
     public function get($text)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM autocomplete WHERE ngram = ? LIMIT 10");
+        $stmt = $this->pdo->prepare("SELECT * FROM autocomplete WHERE ngram = ? ORDER BY weight DESC LIMIT 10");
         $stmt->execute([$text]);
         return $stmt->fetchAll();
     }
