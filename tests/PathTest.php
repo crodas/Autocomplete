@@ -33,10 +33,10 @@ class PathTest extends \phpunit_framework_testcase
         $ac = new Autocomplete(new PDOConn($pdo));
         $time = microtime(true);
         $this->assertEquals($ac->suggest('Fath'), $ac->suggest('FATH'));
-        $this->assertTrue(microtime(true)-$time < 0.01);
+        $this->assertTrue(microtime(true)-$time < 0.02);
         $time = microtime(true);
         $this->assertEquals([], $ac->suggest('xxxx'));
-        $this->assertTrue(microtime(true)-$time < 0.01);
+        $this->assertTrue(microtime(true)-$time < 0.02);
     }
 
     /** @dependsOn testLearn */
