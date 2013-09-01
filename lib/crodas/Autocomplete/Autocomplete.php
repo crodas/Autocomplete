@@ -48,11 +48,15 @@ class Autocomplete
     public function index($text, $weight = 1)
     {
         $text   = mb_strtolower(trim($text));
-        $words  = array_merge([$text], preg_split('/\W+/', $text));
+        if (preg_match('/\W+/', $text)) {
+            $words  = array_merge([$text], preg_split('/\W+/', $text));
+        } else {
+            $words  = [$text];
+        }
         $ngrams = [];
         foreach ($words as $word) {
             $len  = mb_strlen($word);
-            for ($e = 0; $e <= $len; $e++) {
+            for ($e = 1; $e <= $len; $e++) {
                 $ngrams[] = mb_substr($word, 0, $e);
             }
         }

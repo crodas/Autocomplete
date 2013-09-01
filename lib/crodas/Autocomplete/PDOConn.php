@@ -39,33 +39,38 @@ namespace crodas\Autocomplete;
 class PDOConn implements DBInterface
 {
     protected $pdo;
-    protected $prep;
 
     public function __construct (\PDO $pdo)
     {
-        $this->pdo  = $pdo;
-        $this->prep = $pdo->prepare("REPLACE INTO autocomplete VALUES(?, ?, ?)");
+        $this->pdo = $pdo;
     }
 
     public function install()
     {
         $pdo = $this->pdo;
-        $pdo->exec("create table autocomplete (word varchar(50), ngram varchar(10), weight)");
+        $pdo->exec("create table autocomplete (word varchar(50), ngram varchar(10), weight int)");
         $pdo->exec("create unique index filter on autocomplete (word, ngram)");
         $pdo->exec("create index sort on autocomplete (ngram, weight desc)");
     }
 
     public function save($text, Array $ngrams, $weight)
     {
+        static $index;
+        if (empty($index)) {
+            $index = $this->pdo->prepare("REPLACE INTO autocomplete VALUES(?, ?, ?)");
+        }
         foreach ($ngrams as $ngram) {
-            $this->prep->execute([$text, $ngram, $weight]);
+            $index->execute([$text, $ngram, $weight]);
         }
     }
 
     public function get($text)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM autocomplete WHERE ngram = ? ORDER BY weight DESC LIMIT 10");
-        $stmt->execute([$text]);
-        return $stmt->fetchAll();
+        static $search;
+        if (empty($search)) {
+            $search = $this->pdo->prepare("SELECT * FROM autocomplete WHERE ngram = ? ORDER BY weight DESC LIMIT 10");
+        }
+        $search->execute([$text]);
+        return $search->fetchAll();
     }
 }
